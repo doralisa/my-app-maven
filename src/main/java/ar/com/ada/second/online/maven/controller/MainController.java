@@ -33,10 +33,6 @@ public class MainController {
                     mainView.invalidOption();
                     break;
             }
-<<<<<<< HEAD
-=======
-
->>>>>>> parent of 562eaf2... Revert "Actualización 20/01/2021"
         }
     }
 }
