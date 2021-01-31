@@ -26,24 +26,14 @@ public class MainView {
 
     public void showTitleReturnMenu () {
         System.out.println("\n********************************");
-<<<<<<< HEAD
         System.out.println("*      ADA SOCIAL NETWORK      *");;
-=======
-        System.out.println("*      ADA SOCIAL NETWORK      *");
->>>>>>> parent of 562eaf2... Revert "Actualización 20/01/2021"
         System.out.println("********************************\n");
     }
 
     public Integer mainMenuSelectionOption () {
         System.out.println("Seleccione un modulo en el que desea trabajar: ");
-<<<<<<< HEAD
         System.out.println("| 1 | Usuarios");;
-=======
-        System.out.println("| 1 | Usuarios");
->>>>>>> parent of 562eaf2... Revert "Actualización 20/01/2021"
         System.out.println("| 5 | Finalizar App");
         return Keyboard.getInputInteger();
     }
-
-
 }

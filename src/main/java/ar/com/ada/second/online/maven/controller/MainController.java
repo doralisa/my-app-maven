@@ -5,6 +5,7 @@ import ar.com.ada.second.online.maven.vista.MainView;
 public class MainController {
     private static MainController mainController;
     private MainView mainView = MainView.getInstance();
+    private UserController userController = UserController.getInstance();
 
     private MainController () {}
 
@@ -23,8 +24,7 @@ public class MainController {
             Integer option = mainView.mainMenuSelectionOption();
             switch (option) {
                 case 1:
-                    //llamaria al controlador de usuario
-                    System.out.println("llamar al controlador de usuario");
+                    userController.init();
                     break;
                 case 5:
                     shouldItStay = false;
