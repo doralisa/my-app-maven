@@ -1,5 +1,7 @@
 package ar.com.ada.second.online.maven.controller;
 
+import ar.com.ada.second.online.maven.model.dao.JpaUserDAO;
+import ar.com.ada.second.online.maven.model.dao.UserDAO;
 import ar.com.ada.second.online.maven.model.dto.UserDTO;
 import ar.com.ada.second.online.maven.vista.MainView;
 import ar.com.ada.second.online.maven.vista.UserView;
@@ -10,6 +12,7 @@ public class UserController {
     private static UserController userController;
     private UserView userView = UserView.getInstance();
     private MainView mainView = MainView.getInstance();
+    private JpaUserDAO jpaUserDAO = JpaUserDAO.getInstance();
 
     private UserController() {
     }
@@ -50,6 +53,12 @@ public class UserController {
 
         UserDTO userDTO = new UserDTO(nickname, email);
 
+        System.out.println("before to save");
         System.out.println(userDTO.toString());
+        UserDAO userDAO = UserDAO.toDao(userDTO);
+
+        jpaUserDAO.save(userDAO);
+        System.out.println("after to save");
+        System.out.println(userDAO.toString());
     }
 }

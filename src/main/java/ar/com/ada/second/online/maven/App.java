@@ -7,7 +7,6 @@ public class App {
 
         MainController mainController = MainController.getInstance();
         mainController.init();
-
     }
 
 }
