@@ -9,14 +9,14 @@ public abstract class JPA {
 
     protected static EntityManager entityManager;
 
-    private void openConnection() {
+    protected void openConnection() {
         if (entityManager == null || !entityManager.isOpen())
             entityManager = Persistence
                     .createEntityManagerFactory("my-persistence-unit") //REVISAR ERROR
                     .createEntityManager();
     }
-// Clase 04/01/21 2 h 30 m BUSCAR EN EL GIT DE VLADY
-    private void closeConnection() {
+
+    protected void closeConnection() {
         if (entityManager != null && entityManager.isOpen())
             entityManager.close();
     }

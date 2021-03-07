@@ -75,6 +75,7 @@ public class Keyboard {
                 keyboard.next();
             }
         }
+
         return Integer.parseInt(txt);
     }
 

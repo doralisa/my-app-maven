@@ -53,12 +53,21 @@ public class UserController {
 
         UserDTO userDTO = new UserDTO(nickname, email);
 
-        System.out.println("before to save");
-        System.out.println(userDTO.toString());
+        try {
+            jpaUserDAO.findByEmailOrNickname(userDTO.getEmail(), userDTO.getNickname());
+        } catch (Exception e) {
+            //System.out.println(e.getMessage());
+            userView.existingUser();
+            return;
+        }
+
         UserDAO userDAO = UserDAO.toDao(userDTO);
 
         jpaUserDAO.save(userDAO);
-        System.out.println("after to save");
-        System.out.println(userDAO.toString());
+
+        userDTO.setId(userDAO.getId());
+
+        userView.showNewUser(userDTO);
+
     }
 }
