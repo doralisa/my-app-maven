@@ -1,6 +1,6 @@
 package ar.com.ada.second.online.maven.controller;
 
-import ar.com.ada.second.online.maven.vista.MainView;
+import ar.com.ada.second.online.maven.view.MainView;
 
 public class MainController {
     private static MainController mainController;

@@ -3,10 +3,13 @@ package ar.com.ada.second.online.maven.controller;
 import ar.com.ada.second.online.maven.model.dao.JpaUserDAO;
 import ar.com.ada.second.online.maven.model.dao.UserDAO;
 import ar.com.ada.second.online.maven.model.dto.UserDTO;
-import ar.com.ada.second.online.maven.vista.MainView;
-import ar.com.ada.second.online.maven.vista.UserView;
+import ar.com.ada.second.online.maven.utils.Keyboard;
+import ar.com.ada.second.online.maven.utils.Paginator;
+import ar.com.ada.second.online.maven.view.MainView;
+import ar.com.ada.second.online.maven.view.UserView;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class UserController {
     private static UserController userController;
@@ -34,6 +37,9 @@ public class UserController {
                 case 1:
                     createNewUser();
                     break;
+                case 2:
+                    showAllUsers();
+                    break;
                 case 5:
                     shouldItStay = false;
                     mainView.showTitleReturnMenu();
@@ -43,6 +49,72 @@ public class UserController {
                     break;
             }
         }
+    }
+
+    private void showAllUsers() {
+        printRecordsPerPage(null, true);
+    }
+
+    private Integer printRecordsPerPage(String optionSelectEditOrDelete, boolean isHeaderShown) {
+        int limit = 4,
+                currentPage = 0,
+                totalUsers,
+                totalPages,
+                usersIdSelected = 0;
+
+        List<UserDAO> users;
+        List<String> paginator;
+
+        boolean shouldGetOut = false;
+
+        while (!shouldGetOut) {
+            totalUsers = jpaUserDAO.getTotalRecords();
+            totalPages = (int) Math.ceil((double) totalUsers / limit);
+            paginator = Paginator.buildPaginator(currentPage, totalPages);
+            users = jpaUserDAO.findAll(currentPage * limit, limit);
+
+            if (!users.isEmpty()) {
+                String choice = userView.printUsersPerPage(users, paginator, optionSelectEditOrDelete, isHeaderShown);
+
+                switch (choice) {
+                    case "i":
+                    case "I":
+                        currentPage = 0;
+                        break;
+                    case "a":
+                    case "A":
+                        if (currentPage > 0) currentPage--;
+                        break;
+                    case "s":
+                    case "S":
+                        if (currentPage + 1 < totalPages) currentPage++;
+                        break;
+                    case "u":
+                    case "U":
+                        currentPage = totalPages - 1;
+                        break;
+                    case "q":
+                    case "Q":
+                        shouldGetOut = true;
+                        break;
+                    default:
+                        if (optionSelectEditOrDelete != null) {
+                            usersIdSelected = Integer.parseInt(choice);
+                            shouldGetOut = true;
+                        } else {
+                            if (choice.matches("^-?\\d+$")) {
+                                int page = Integer.parseInt(choice);
+                                if (page > 0 && page <= totalPages) currentPage = page - 1;
+                            } else Keyboard.invalidData();
+                        }
+                }
+            } else {
+                shouldGetOut = true;
+                userView.usersListNotFound();
+            }
+        }
+
+        return usersIdSelected;
     }
 
     private void createNewUser() {

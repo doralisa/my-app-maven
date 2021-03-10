@@ -1,4 +1,4 @@
-package ar.com.ada.second.online.maven.vista;
+package ar.com.ada.second.online.maven.view;
 
 import ar.com.ada.second.online.maven.utils.Keyboard;
 

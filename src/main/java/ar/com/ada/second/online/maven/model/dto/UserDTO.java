@@ -2,9 +2,6 @@ package ar.com.ada.second.online.maven.model.dto;
 
 // DTO: Data Transfer Object
 
-import ar.com.ada.second.online.maven.controller.UserController;
-import ar.com.ada.second.online.maven.vista.MainView;
-import ar.com.ada.second.online.maven.vista.UserView;
 import lombok.*;
 
 @NoArgsConstructor
