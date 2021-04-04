@@ -12,7 +12,7 @@ public abstract class JPA {
     protected void openConnection() {
         if (entityManager == null || !entityManager.isOpen())
             entityManager = Persistence
-                    .createEntityManagerFactory("my-persistence-unit") //REVISAR ERROR
+                    .createEntityManagerFactory("my-persistence-unit")
                     .createEntityManager();
     }
 
@@ -34,5 +34,4 @@ public abstract class JPA {
         }
         closeConnection();
     }
-
 }
