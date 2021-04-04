@@ -1,16 +1,16 @@
 package ar.com.ada.second.online.maven.model.dao;
 
-//DAO: Data Access Object
+// DAO: DATA ACCESS OBJECT
 
 import ar.com.ada.second.online.maven.model.dto.UserDTO;
 import lombok.*;
 
 import javax.persistence.*;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @ToString
 @Entity
 @Table(name = "User")
@@ -33,9 +33,28 @@ public class UserDAO {
 
     public static UserDAO toDao(UserDTO dto) {
         UserDAO userDAO = new UserDAO(dto.getNickname(), dto.getEmail());
-    if (dto.getId() != null)
-        userDAO.setId(dto.getId());
-    return userDAO;
+        if (dto.getId() != null)
+            userDAO.setId(dto.getId());
+        return userDAO;
     }
 
+    public static UserDTO toDTO(UserDAO dao) {
+        UserDTO dto = new UserDTO(dao.getNickname(), dao.getEmail());
+        if (dao.getId() != null)
+            dto.setId(dao.getId());
+        return dto;
+    }
 }
+
+
+/**
+ * List<RecordSet> list = rs.query("SELECT * FROM User");
+ * for (list) {
+ * <p>
+ * int id = list.get(i).id();
+ * String nickname = list.get(i).nickname();
+ * String email = list.get(i).email();
+ * <p>
+ * UserDAO userDAO = new UserDAO(id, nickname, email);
+ * }
+ */

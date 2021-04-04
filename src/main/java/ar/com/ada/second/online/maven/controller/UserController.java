@@ -10,20 +10,19 @@ import ar.com.ada.second.online.maven.view.UserView;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 public class UserController {
+
     private static UserController userController;
     private UserView userView = UserView.getInstance();
     private MainView mainView = MainView.getInstance();
     private JpaUserDAO jpaUserDAO = JpaUserDAO.getInstance();
 
-    private UserController() {
-    }
+    private UserController() { }
 
     public static UserController getInstance() {
-        if (userController == null)
-            userController = new UserController();
-
+        if (userController == null) userController = new UserController();
         return userController;
     }
 
@@ -32,7 +31,7 @@ public class UserController {
         userView.showTitleUserModule();
 
         while (shouldItStay) {
-            Integer option = userView.UserMenuSelectOption();
+            Integer option = userView.userMenuSelectOption();
             switch (option) {
                 case 1:
                     createNewUser();
@@ -40,19 +39,127 @@ public class UserController {
                 case 2:
                     showAllUsers();
                     break;
+                case 3:
+                    editUser();
+                    break;
+                case 4:
+                    deleteUser();
+                    break;
                 case 5:
                     shouldItStay = false;
                     mainView.showTitleReturnMenu();
                     break;
                 default:
                     mainView.invalidOption();
-                    break;
             }
         }
     }
 
+    private void createNewUser() {
+        HashMap<String, String> dataNewUser = userView.getDataNewUser();
+
+        // 1ra
+        String nickname = dataNewUser.get("nickname");
+        String email = dataNewUser.get("email");
+
+        UserDTO userDTO = new UserDTO(nickname, email);
+
+        /**
+         // 2da A
+         String nickname = dataNewUser.get("nickname");
+         String email = dataNewUser.get("email");
+         UserDTO userDTO = new UserDTO();
+         userDTO.setNickname(nickname);
+         userDTO.setEmail(email);
+         // 2da B
+         UserDTO userDTO = new UserDTO();
+         userDTO.setNickname(dataNewUser.get("nickname"));
+         userDTO.setEmail(dataNewUser.get("email"));
+         */
+
+        // validacion de registro en la base de datos
+        try {
+            jpaUserDAO.findByEmailOrNickName(userDTO.getEmail(), userDTO.getNickname());
+        } catch (Exception e) {
+            //System.out.println(e.getMessage());
+            userView.existingUser();
+            return;
+        }
+
+        UserDAO userDAO = UserDAO.toDao(userDTO);
+
+        jpaUserDAO.save(userDAO);
+
+        userDTO.setId(userDAO.getId());
+
+        userView.showNewUser(userDTO);
+    }
+
     private void showAllUsers() {
         printRecordsPerPage(null, true);
+    }
+
+    private void editUser() {
+        UserDAO userToEdit = getUserToEditOrDelete(Paginator.EDIT);
+        if (userToEdit != null) {
+            HashMap<String, String> dataEditUser = userView.getDataEditUser(userToEdit);
+
+            if (!dataEditUser.get("nickname").isEmpty())
+                userToEdit.setNickname(dataEditUser.get("nickname"));
+
+            if (!dataEditUser.get("email").isEmpty())
+                userToEdit.setEmail(dataEditUser.get("email"));
+
+            jpaUserDAO.save(userToEdit);
+            // jpaUserDAO.update(userToEdit);
+
+            UserDTO userDTO = UserDAO.toDTO(userToEdit);
+
+            userView.showUser(userDTO);
+        }
+    }
+
+    private void deleteUser() {
+        UserDAO userToDelete = getUserToEditOrDelete(Paginator.DELETE);
+        if (userToDelete != null) {
+            Boolean answer = userView.areYouSureToRemoveIt(userToDelete);
+            if (answer) {
+                Boolean hasDeleted = jpaUserDAO.delete(userToDelete);
+                if (hasDeleted) {
+                    userView.userHasBeenSuccessfullyRemoved();
+                } else {
+                    userView.errorWhenDeletingUser();
+                }
+            } else {
+                userView.editOrDeleteUserCanceled(Paginator.DELETE);
+            }
+        } else {
+            userView.editOrDeleteUserCanceled(Paginator.DELETE);
+        }
+    }
+
+    private UserDAO getUserToEditOrDelete(String optionEditOrDelete) {
+        boolean shouldGetOut = false;
+        Optional<UserDAO> userToEditOptional = Optional.empty();
+        String actionInfo = Paginator.EDIT.equals(optionEditOrDelete) ? "editar" : "eliminar";
+        userView.selectUserIdToEditOrDeleteInfo(actionInfo);
+
+        Integer userIdToEdit = printRecordsPerPage(optionEditOrDelete, false);
+
+        if (userIdToEdit != 0) {
+            while (!shouldGetOut) {
+                userToEditOptional = jpaUserDAO.findById(userIdToEdit);
+                if (!userToEditOptional.isPresent()) {
+                    userView.userNotExist(userIdToEdit);
+                    userIdToEdit = userView.userIdSelection(optionEditOrDelete);
+                    shouldGetOut = (userIdToEdit == 0);
+                } else {
+                    shouldGetOut = true;
+                }
+            }
+        }
+
+        return userToEditOptional.isPresent() ? userToEditOptional.get() : null;
     }
 
     private Integer printRecordsPerPage(String optionSelectEditOrDelete, boolean isHeaderShown) {
@@ -115,31 +222,5 @@ public class UserController {
         }
 
         return usersIdSelected;
-    }
-
-    private void createNewUser() {
-        HashMap<String, String> dataNewUser = userView.getDataNewUser();
-
-        String nickname = dataNewUser.get("nickname");
-        String email = dataNewUser.get("email");
-
-        UserDTO userDTO = new UserDTO(nickname, email);
-
-        try {
-            jpaUserDAO.findByEmailOrNickname(userDTO.getEmail(), userDTO.getNickname());
-        } catch (Exception e) {
-            //System.out.println(e.getMessage());
-            userView.existingUser();
-            return;
-        }
-
-        UserDAO userDAO = UserDAO.toDao(userDTO);
-
-        jpaUserDAO.save(userDAO);
-
-        userDTO.setId(userDAO.getId());
-
-        userView.showNewUser(userDTO);
-
     }
 }

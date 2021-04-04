@@ -12,13 +12,13 @@ public class JpaUserDAO extends JPA implements DAO<UserDAO> {
     }
 
     public static JpaUserDAO getInstance() {
-        if (jpaUserDAO == null)
-            jpaUserDAO = new JpaUserDAO();
+        if (jpaUserDAO == null) jpaUserDAO = new JpaUserDAO();
         return jpaUserDAO;
     }
 
-    public void findByEmailOrNickname(String email, String nickname) throws Exception {
+    public void findByEmailOrNickName(String email, String nickname) throws Exception {
         openConnection();
+        // SELECT * FROM User WHERE email=? OR nickname=?
         TypedQuery<UserDAO> query = entityManager.createQuery(
                 "SELECT u FROM UserDAO u WHERE u.email=:email OR u.nickname=:nickname",
                 UserDAO.class
@@ -31,20 +31,20 @@ public class JpaUserDAO extends JPA implements DAO<UserDAO> {
         closeConnection();
 
         if (byEmailAndNickName.isPresent()) {
-            throw new Exception("Ya existe un usuario con ese email o nickname.");
+            throw new Exception("Ya existe un usuario con ese email y nickname");
         }
     }
 
     @Override
-    public void save(UserDAO userDAO) {
-        //Función anónima
-        executeInsideTransaction(entityManager -> {
-            entityManager.persist(userDAO);
-        });
-
-        //otra forma de hacer una función anónima:
-        //Consumer<EntityManager> persistUser = entityManager -> entityManager.persist(userDAO);
-        //executeInsideTransaction(persistUser);
+    public void save(UserDAO dao) {
+        // Consumer<EntityManager> persisUser = entityManager -> entityManager.persist(dao);
+        // executeInsideTransaction(persisUser);
+        if (dao.getId() == null)
+            //guardar insertando registro nuevo (persist)
+            executeInsideTransaction(entityManager -> entityManager.persist(dao));
+        else
+            //guardar actualizando un registro (merge)
+            executeInsideTransaction(entityManager -> entityManager.merge(dao));
     }
 
     @Override
@@ -56,8 +56,32 @@ public class JpaUserDAO extends JPA implements DAO<UserDAO> {
         return count;
     }
 
+    @Override
+    public Optional<UserDAO> findById(Integer id) {
+        openConnection();
+        UserDAO userDAO = entityManager.find(UserDAO.class, id);
+        closeConnection();
+
+        return Optional.ofNullable(userDAO);
+    }
+
+    @Override
+    public Boolean delete(UserDAO dao) {
+        openConnection();
+        // sincronizacion
+        UserDAO userToDelete = entityManager.merge(dao);
+        // borrado
+        executeInsideTransaction(entityManager -> entityManager.remove(userToDelete));
+        closeConnection();
+
+        Optional<UserDAO> verifybyId = findById(dao.getId());
+
+        return !verifybyId.isPresent();
+    }
+
     public List<UserDAO> findAll(Integer from, Integer limit) {
         openConnection();
+
         TypedQuery<UserDAO> query = entityManager.createQuery("SELECT u FROM UserDAO u", UserDAO.class);
         query.setFirstResult(from);
         query.setMaxResults(limit);

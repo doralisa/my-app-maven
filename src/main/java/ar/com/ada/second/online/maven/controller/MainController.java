@@ -21,7 +21,7 @@ public class MainController {
         mainView.showTitleApp();
 
         while (shouldItStay) {
-            Integer option = mainView.mainMenuSelectionOption();
+            Integer option = mainView.mainMenuSelectOption();
             switch (option) {
                 case 1:
                     userController.init();

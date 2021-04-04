@@ -5,21 +5,20 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Keyboard {
-
-    //1) Crear attr privado estatico de la instancia que queremos que sea única
+    // 1) crear un attr privado static de la instancia que queremos que sea unica
     private static Scanner scanner;
 
-    //2) El constructor debe ser privado
+    // 2) el constructor debe ser privado.
     private Keyboard() {
     }
 
-    //3) Crear un metodo estatico y publico > getInstance()
+    // 3) crear un metodo statico y publico llamado getInstance()
     public static Scanner getInstance() {
         if (scanner == null)
             scanner = new Scanner(System.in);
+
         return scanner;
     }
-
 
     public static void pressEnterKeyToContinue() {
         System.out.println("Presione la tecla Enter para continuar...");
@@ -53,6 +52,7 @@ public class Keyboard {
                 keyboard.next();
             }
         }
+
         return txt;
     }
 
@@ -76,6 +76,7 @@ public class Keyboard {
             }
         }
 
+        // "123" => 123
         return Integer.parseInt(txt);
     }
 
@@ -98,6 +99,8 @@ public class Keyboard {
                 keyboard.next();
             }
         }
+
+        // "123.123" => 123.123
         return Double.parseDouble(txt);
     }
 
