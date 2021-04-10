@@ -6,6 +6,7 @@ import ar.com.ada.second.online.maven.model.dto.UserDTO;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,12 +27,15 @@ public class UserDAO {
     @Column(name = "email", length = 50, nullable = false, unique = true)
     private String email;
 
+    @OneToMany(mappedBy = "user")
+    private List<PostDAO> posts;
+
     public UserDAO(String nickname, String email) {
         this.nickname = nickname;
         this.email = email;
     }
 
-    public static UserDAO toDao(UserDTO dto) {
+    public static UserDAO toDAO(UserDTO dto) {
         UserDAO userDAO = new UserDAO(dto.getNickname(), dto.getEmail());
         if (dto.getId() != null)
             userDAO.setId(dto.getId());

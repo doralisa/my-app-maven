@@ -35,17 +35,35 @@ public class JpaUserDAO extends JPA implements DAO<UserDAO> {
         }
     }
 
+    public UserDAO findByNickname(String nickname) {
+        openConnection();
+
+        TypedQuery<UserDAO> query = entityManager.createQuery(
+                "SELECT u FROM UserDAO AS u WHERE nickname=:nickname",
+                UserDAO.class
+        );
+        query.setParameter("nickname", nickname);
+
+        Optional<UserDAO> byNickname = query.getResultList().stream().findFirst();
+
+        closeConnection();
+
+        return byNickname.orElse(null);
+    }
+
     @Override
     public void save(UserDAO dao) {
         // Consumer<EntityManager> persisUser = entityManager -> entityManager.persist(dao);
         // executeInsideTransaction(persisUser);
         if (dao.getId() == null)
-            //guardar insertando registro nuevo (persist)
             executeInsideTransaction(entityManager -> entityManager.persist(dao));
         else
-            //guardar actualizando un registro (merge)
             executeInsideTransaction(entityManager -> entityManager.merge(dao));
     }
+
+//    public void update(UserDAO userDAO) {
+//        executeInsideTransaction(entityManager -> entityManager.merge(userDAO));
+//    }
 
     @Override
     public Integer getTotalRecords() {
@@ -79,6 +97,7 @@ public class JpaUserDAO extends JPA implements DAO<UserDAO> {
         return !verifybyId.isPresent();
     }
 
+    @Override
     public List<UserDAO> findAll(Integer from, Integer limit) {
         openConnection();
 
